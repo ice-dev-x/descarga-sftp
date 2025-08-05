@@ -69,6 +69,15 @@ class Program
             sftp.Connect();
             Log("Conectado a SFTP.");
 
+            Console.WriteLine("\n📂 Archivos disponibles en el servidor y su fecha real de modificación:");
+foreach (var file in sftp.ListDirectory(remoteBase))
+{
+    if (!file.Name.StartsWith(".") && !file.IsDirectory)
+    {
+        Console.WriteLine($"Archivo: {file.Name} - Modificado: {file.LastWriteTime:dd/MM/yyyy HH:mm}");
+    }
+}
+
             if (!sftp.Exists(remoteBase))
             {
                 Log($"Ruta remota inválida: {remoteBase}");
@@ -77,9 +86,26 @@ class Program
             }
 
             sftp.ChangeDirectory(remoteBase);
-            var files = sftp.ListDirectory(remoteBase)
+            /*var files = sftp.ListDirectory(remoteBase)
                             .Where(f => !f.Name.StartsWith(".") && !f.IsDirectory)
-                            .ToList();
+                            .ToList();*/
+
+            var today = DateTime.Today;
+
+            /* files = sftp.ListDirectory(remoteBase)
+                .Where(f => !f.Name.StartsWith(".") && !f.IsDirectory)
+                .Where(f =>
+                {
+                    var (fecha, _) = ExtractDateAndType(f.Name);
+                    return fecha.HasValue && fecha.Value.Date == today;
+                })
+                .ToList();*/
+                var files = sftp.ListDirectory(remoteBase)
+                .Where(f => !f.Name.StartsWith(".") && !f.IsDirectory)
+                .Where(f => f.LastWriteTime.Date == today)
+                .ToList();
+                
+            Log($"Archivos encontrados con fecha de hoy ({today:dd/MM/yyyy}): {files.Count}");
 
             if (files.Count == 0)
             {
