@@ -309,7 +309,7 @@ static void OrganizarArchivo(string fileName, string currentFullPath, string bas
 
     static void EsperarSalida()
     {
-        Console.WriteLine("Presione ENTER para salir...");
-        Console.ReadLine();
+        //Console.WriteLine("Presione ENTER para salir...");
+        //Console.ReadLine();
     }
 }
